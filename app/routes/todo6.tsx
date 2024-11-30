@@ -33,10 +33,11 @@ export const action: ActionFunction = async ({ request, context }) => {
   const formData = await request.formData();
   const intent = formData.get("intent");
   const { env, cf, ctx } = context.cloudflare;
-
+console.log("intent=", intent);
   switch (intent) {
     case "create": {
       const title = formData.get("title");
+      console.log("title=", title);
       await env.DB.prepare(
         "INSERT INTO todo6 (title, completed) VALUES (?, false)"
       )
@@ -73,6 +74,7 @@ import Head from '../components/Head';
 import ConfirmDialog from '../components/ConfirmDialog'
 import FormDialog from './todo6/Form';
 const DIALOG_NAME_1 = "confirm_dialog1";
+const DIALOG_EDIT = "dialog_edit";
 //
 export default function Todos() {
   const { todos } = useLoaderData<{ todos: Todo[] }>();
@@ -115,10 +117,12 @@ export default function Todos() {
   };
 
   const handleDelete = (id: number) => {
-    const formData = new FormData();
-    formData.append("intent", "delete");
-    formData.append("id", id.toString());
-    submit(formData, { method: "post" });
+    if (confirm("本当に削除しますか？")) {
+      const formData = new FormData();
+      formData.append("intent", "delete");
+      formData.append("id", id.toString());
+      submit(formData, { method: "post" });
+    }
   };
   
   const addOpen = function(){
@@ -132,6 +136,20 @@ export default function Todos() {
     const modalDialog = document.getElementById(DIALOG_NAME_1);
     if(modalDialog) { modalDialog.close();}
   }
+
+  const editOpen = function(){
+    const modalDialog = document.getElementById(DIALOG_EDIT);
+    if(modalDialog) {
+      modalDialog.showModal();
+    }
+  }
+
+  const ediClose = function(){
+    const modalDialog = document.getElementById(DIALOG_EDIT);
+    if(modalDialog) { modalDialog.close();}
+  }
+
+
   const cbFunc = function(){
 
   };
@@ -151,18 +169,31 @@ export default function Todos() {
               onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
-          <hr />
+          <hr className="my-2" />
           {/* form_add */}
-          <hr />
-          <button onClick={()=>{addOpen()}}>[ Create ]</button>
+          <button
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" 
+          onClick={()=>{addOpen()}}>Create</button>
+
           <dialog id={DIALOG_NAME_1} className="dialog shadow-lg rounded-lg p-2">
             <div className="text-end mx-2">
               <button onClick={()=>addClose()} className="">close</button>
             </div>
             <h1 className="text-2xl font-bold">TODO-New</h1>
             <hr className="my-2" />
-            <FormDialog mode="create" idName={DIALOG_NAME_1} />
+            <FormDialog mode="create" idName={DIALOG_NAME_1}
+            editingTodo={null} />
           </dialog>
+          {/*  edit_dialog */}
+          <dialog id={DIALOG_EDIT} className="dialog shadow-lg rounded-lg p-2">
+            <div className="text-end mx-2">
+              <button onClick={()=>addClose()} className="">close</button>
+            </div>
+            <h1 className="text-2xl font-bold">TODO-Edit</h1>
+            <hr className="my-2" />
+            <FormDialog mode="update" idName={DIALOG_EDIT} editingTodo={editingTodo} />
+          </dialog>
+
           <hr className="my-2" />
         </div>
       </div>
@@ -175,44 +206,15 @@ export default function Todos() {
           >
             <span>{todo.title}</span>
             <div className="flex gap-2">
-              {/*
-              <Dialog open={isEditDialogOpen && editingTodo?.id === todo.id} 
-                     onOpenChange={(open) => {
-                       setIsEditDialogOpen(open);
-                       if (!open) setEditingTodo(null);
-                     }}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    onClick={() => setEditingTodo(todo)}
-                  >
-                    編集
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>TODOの編集</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleUpdate}>
-                    <input type="hidden" name="intent" value="update" />
-                    <input type="hidden" name="id" value={todo.id} />
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor={`edit-title-${todo.id}`}>タイトル</Label>
-                        <Input
-                          id={`edit-title-${todo.id}`}
-                          name="title"
-                          defaultValue={todo.title}
-                          required
-                        />
-                      </div>
-                      <Button type="submit">更新</Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
-              */}
-
+              <button
+                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                onClick={() => {
+                  setEditingTodo(todo);
+                  editOpen();
+                }}
+              >
+                編集
+              </button>
               <button
                 variant="destructive"
                 onClick={() => handleDelete(todo.id)}
