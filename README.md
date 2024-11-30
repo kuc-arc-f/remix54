@@ -15,6 +15,11 @@ d1 + pages , Remix example
 
 ***
 ### Setup
+
+* table
+* ./schema.sql
+
+***
 * wrangler.toml
 
 ```
