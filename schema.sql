@@ -115,4 +115,29 @@ CREATE TABLE todo7 (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
+---post
+CREATE TABLE posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT,
+    content_type TEXT,
+    age TEXT,
+    public BOOLEAN DEFAULT false,
+    food_orange BOOLEAN DEFAULT false,
+    food_apple BOOLEAN DEFAULT false,
+    food_banana BOOLEAN DEFAULT false,
+    food_melon BOOLEAN DEFAULT false,
+    food_grape BOOLEAN DEFAULT false,
+    date_publish DATE,
+    date_update DATE,
+    post_number TEXT,
+    address_country TEXT,
+    address_pref TEXT,
+    address_city TEXT,
+    address_1 TEXT,
+    address_2 TEXT,
+    text_option1 TEXT,
+    text_option2 TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
