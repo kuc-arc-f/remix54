@@ -11,7 +11,12 @@
 ***
 ### Summary
 
-d1 + pages , Remix example
+d1 + pages + Remix , claude.ai generate
+
+***
+### Related
+
+* https://claude.ai
 
 ***
 ### Setup
